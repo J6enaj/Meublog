@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Jogo do Dinossauro</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            overflow: hidden;
+            background-color: #f4f4f4;
+        }
+
+        #game-container {
+            position: relative;
+            width: 100vw;
+            height: 100vh;
+            overflow: hidden;
+            display: flex;
+            justify-content: flex-start;
+            align-items: flex-end;
+            background-color: #e0e0e0;
+        }
+
+        #background {
+            position: absolute;
+            width: 200%;
+            height: 100%;
+            background: url('Parallax_No_Car.gif') repeat-x;
+            background-size: cover;
+            animation: move-background 5s linear infinite;
+        }
+
+        @keyframes move-background {
+            from {
+                left: 0;
+            }
+            to {
+                left: -100%;
+            }
+        }
+
+        #player {
+            position: absolute;
+            bottom: 50px;
+            left: 50px;
+            width: 50px;
+            height: 50px;
+            background: url('jogador.jpg') no-repeat center;
+            background-size: contain;
+        }
+
+        #enemy {
+            position: absolute;
+            bottom: 50px;
+            right: -50px;
+            width: 40px;
+            height: 40px;
+            background: url('inimigo.png') no-repeat center;
+            background-size: contain;
+            animation: move-enemy 3s linear infinite;
+        }
+
+        @keyframes move-enemy {
+            from {
+                right: -50px;
+            }
+            to {
+                right: 100vw;
+            }
+        }
+
+        .jump {
+            animation: jump-animation 0.8s ease-out;
+        }
+
+        @keyframes jump-animation {
+            0% {
+                bottom: 50px;
+            }
+            50% {
+                bottom: 150px;
+            }
+            100% {
+                bottom: 50px;
+            }
+        }
+
+        #jump-button {
+            position: absolute;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            padding: 10px 20px;
+            font-size: 16px;
+            background-color: #ff5722;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        #jump-button:active {
+            background-color: #e64a19;
+        }
+    </style>
+</head>
+<body>
+    <div id="game-container">
+        <div id="background"></div>
+        <div id="player"></div>
+        <div id="enemy"></div>
+        <button id="jump-button">Pular</button>
+    </div>
+
+    <script>
+        const player = document.getElementById('player');
+        const enemy = document.getElementById('enemy');
+        const jumpButton = document.getElementById('jump-button');
+        const background = document.getElementById('background');
+
+        let isJumping = false;
+        let playerPositionX = 50; // Posição do jogador (movimento contínuo)
+        let playerBottom = 50; // Posição vertical do jogador
+
+        // Função de pulo
+        function jump() {
+            if (!isJumping) {
+                isJumping = true;
+                player.classList.add('jump');
+                setTimeout(() => {
+                    player.classList.remove('jump');
+                    isJumping = false;
+                }, 800); // Duração do pulo
+            }
+        }
+
+        // Função para mover o jogador para a direita (movimento contínuo)
+        function movePlayer() {
+            if (playerPositionX < window.innerWidth - 60) { // O personagem não sai da tela
+                playerPositionX += 5; // Velocidade do movimento para a direita
+                player.style.left = playerPositionX + 'px';
+            } else {
+                // Recarregar o jogo ao alcançar o final da tela
+                playerPositionX = 50; // Reseta a posição do jogador
+                alert('Você chegou ao final! O jogo vai recomeçar.');
+                window.location.reload(); // Reinicia o jogo
+            }
+        }
+
+        // Função de detecção de colisão
+        function checkCollision() {
+            const playerRect = player.getBoundingClientRect();
+            const enemyRect = enemy.getBoundingClientRect();
+
+            if (
+                playerRect.right > enemyRect.left &&
+                playerRect.left < enemyRect.right &&
+                playerRect.bottom > enemyRect.top &&
+                playerRect.top < enemyRect.bottom
+            ) {
+                alert('Game Over! Você perdeu.');
+                window.location.reload
